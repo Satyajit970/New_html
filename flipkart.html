@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Flipkart Home – Static Clone</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --brand:#2874f0;          /* Flipkart-like blue */
+      --brand-dark:#1f5ec2;
+      --accent:#ffdf00;         /* warm accent */
+      --bg:#f1f3f6;             /* site background */
+      --card:#fff;              /* card background */
+      --text:#1f2937;           /* primary text */
+      --muted:#6b7280;          /* secondary text */
+      --border:#e5e7eb;         /* subtle borders */
+      --success:#2ecc71;
+      --danger:#e74c3c;
+      --radius:14px;
+      --shadow:0 6px 18px rgba(0,0,0,.06);
+      --shadow-soft:0 2px 8px rgba(0,0,0,.07);
+      --max:1280px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+      color:var(--text); background:var(--bg);
+    }
+    a{color:inherit; text-decoration:none}
+
+    /* Header */
+    .topbar{
+      position:sticky; top:0; z-index:50;
+      background:var(--brand); color:#fff; box-shadow:var(--shadow);
+    }
+    .container{max-width:var(--max); margin-inline:auto; padding:0 16px}
+    .nav{display:flex; align-items:center; gap:16px; padding:12px 0}
+    .logo{display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.2px}
+    .logo .mark{display:inline-grid; place-items:center; width:36px; height:36px; border-radius:10px; background:#fff; color:var(--brand); font-weight:900}
+    .search{
+      flex:1; display:flex; align-items:center; gap:8px; background:#fff; border-radius:999px; padding:8px 12px;
+    }
+    .search input{border:none; outline:none; width:100%; font-size:14px}
+    .search .btn{background:var(--brand); color:#fff; padding:8px 14px; border-radius:20px; font-weight:600; border:1px solid var(--brand-dark)}
+    .nav-actions{display:flex; align-items:center; gap:16px; font-weight:600}
+    .nav-actions .pill{background:#1e64d6; padding:8px 12px; border-radius:999px}
+
+    /* Category strip */
+    .categories{background:#fff; box-shadow:var(--shadow-soft)}
+    .cat-row{display:grid; grid-template-columns:repeat(10,1fr); gap:8px; padding:10px 0}
+    .cat-item{display:flex; flex-direction:column; align-items:center; gap:8px; padding:12px 8px; border-radius:12px; transition:transform .2s}
+    .cat-item:hover{transform:translateY(-3px)}
+    .cat-item img{width:56px; height:56px; object-fit:cover; border-radius:50%; box-shadow:var(--shadow-soft)}
+    .cat-item span{font-size:12px; color:#111827; text-align:center}
+
+    /* Hero carousel (CSS scroll-snap) */
+    .hero{margin-top:12px}
+    .carousel{display:flex; gap:12px; overflow:auto; scroll-snap-type:x mandatory; scroll-padding:16px; padding-bottom:6px}
+    .slide{min-width:90%; height:260px; background:#ddd; border-radius:var(--radius); box-shadow:var(--shadow); scroll-snap-align:start; position:relative; overflow:hidden}
+    .slide img{width:100%; height:100%; object-fit:cover}
+    .badge{position:absolute; left:16px; bottom:16px; background:rgba(0,0,0,.6); color:#fff; padding:8px 12px; border-radius:999px; font-weight:600}
+
+    /* Deal strip */
+    .strip{background:#fff; border-radius:var(--radius); box-shadow:var(--shadow); padding:16px; display:flex; align-items:center; justify-content:space-between; gap:12px}
+    .strip h3{margin:0; font-size:18px}
+    .strip a.btn{background:var(--brand); color:#fff; padding:10px 14px; border-radius:12px; font-weight:700}
+
+    /* Product sections */
+    .section{margin-top:16px}
+    .section-header{display:flex; align-items:baseline; justify-content:space-between; margin-bottom:10px}
+    .section-header h2{margin:0; font-size:20px}
+    .grid{display:grid; grid-template-columns:repeat(5,1fr); gap:14px}
+    @media (max-width:1024px){ .grid{grid-template-columns:repeat(4,1fr)} }
+    @media (max-width:768px){ .grid{grid-template-columns:repeat(2,1fr)} .slide{min-width:92%; height:200px} .cat-row{grid-template-columns:repeat(5,1fr)} }
+
+    .card{background:var(--card); border-radius:16px; box-shadow:var(--shadow-soft); overflow:hidden; border:1px solid var(--border); display:flex; flex-direction:column}
+    .thumb{position:relative; background:#fafafa}
+    .thumb img{width:100%; aspect-ratio:1/1; object-fit:cover; display:block}
+    .chip{position:absolute; top:10px; left:10px; background:#111827; color:#fff; font-size:12px; padding:6px 10px; border-radius:999px}
+    .content{padding:12px}
+    .title{font-size:14px; font-weight:600; line-height:1.35}
+    .rating{display:flex; align-items:center; gap:8px; margin:6px 0; font-size:12px; color:var(--muted)}
+    .price-row{display:flex; align-items:center; gap:8px}
+    .price{font-weight:800}
+    .mrp{text-decoration:line-through; color:var(--muted); font-size:12px}
+    .off{color:var(--success); font-weight:700; font-size:12px}
+
+    /* Footer */
+    footer{margin-top:32px; background:#0f172a; color:#cbd5e1}
+    .footer-grid{display:grid; grid-template-columns:repeat(6,1fr); gap:16px; padding:28px 0}
+    .footer-grid h4{margin:0 0 10px; color:#fff}
+    .footer-grid a{display:block; padding:4px 0; font-size:14px; color:#cbd5e1}
+    .copyright{border-top:1px solid #1f2937; padding:14px 0; font-size:14px; color:#94a3b8}
+    @media (max-width:900px){ .footer-grid{grid-template-columns:repeat(2,1fr)} }
+
+    /* Tiny helpers */
+    .mt-12{margin-top:12px}
+    .mt-20{margin-top:20px}
+    .mb-12{margin-bottom:12px}
+  </style>
+</head>
+<body>
+  <!-- Top Navigation -->
+  <header class="topbar">
+    <div class="container">
+      <div class="nav">
+        <a class="logo" href="#" aria-label="Flipkart Home">
+          <span class="mark">FK</span>
+          <span>Flipkart</span>
+        </a>
+        <form class="search" role="search" aria-label="Search products">
+          <input type="search" placeholder="Search for products, brands and more" aria-label="Search" />
+          <button class="btn" type="button">Search</button>
+        </form>
+        <nav class="nav-actions">
+          <a class="pill" href="#">Login</a>
+          <a href="#">Become a Seller</a>
+          <a href="#">More</a>
+          <a href="#" aria-label="Cart">🛒 Cart</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- Categories -->
+  <div class="categories">
+    <div class="container">
+      <div class="cat-row">
+        <!-- Repeatable category items -->
+        <a class="cat-item" href="#"><img src="https://picsum.photos/seed/mobiles/200" alt="Mobiles"/><span>Mobiles</span></a>
+        <a class="cat-item" href="#"><img src="https://picsum.photos/seed/fashion/200" alt="Fashion"/><span>Fashion</span></a>
+        <a class="cat-item" href="#"><img src="https://picsum.photos/seed/electronics/200" alt="Electronics"/><span>Electronics</span></a>
+        <a class="cat-item" href="#"><img src="https://picsum.photos/seed/home/200" alt="Home"/><span>Home</span></a>
+        <a class="cat-item" href="#"><img src="https://picsum.photos/seed/appliances/200" alt="Appliances"/><span>Appliances</span></a>
+        <a class="cat-item" href="#"><img src="https://picsum.photos/seed/travel/200" alt="Travel"/><span>Travel</span></a>
+        <a class="cat-item" href="#"><img src="https://picsum.photos/seed/furniture/200" alt="Furniture"/><span>Furniture</span></a>
+        <a class="cat-item" href="#"><img src="https://picsum.photos/seed/toys/200" alt="Toys"/><span>Toys</span></a>
+        <a class="cat-item" href="#"><img src="https://picsum.photos/seed/grocery/200" alt="Grocery"/><span>Grocery</span></a>
+        <a class="cat-item" href="#"><img src="https://picsum.photos/seed/beauty/200" alt="Beauty"/><span>Beauty</span></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hero Carousel -->
+  <section class="hero container">
+    <div class="carousel" aria-label="Promotions">
+      <article class="slide"><img src="https://picsum.photos/seed/hero1/1200/500" alt="Big Sale"/><div class="badge">Big Billion Days • Up to 70% Off</div></article>
+      <article class="slide"><img src="https://picsum.photos/seed/hero2/1200/500" alt="New Arrivals"/><div class="badge">Fresh Arrivals • Trending Now</div></article>
+      <article class="slide"><img src="https://picsum.photos/seed/hero3/1200/500" alt="Electronics Fest"/><div class="badge">Electronics Fest • Crazy Deals</div></article>
+    </div>
+  </section>
+
+  <!-- Deal strip -->
+  <div class="container mt-12">
+    <div class="strip">
+      <h3>Top Deals on Smartphones</h3>
+      <a class="btn" href="#">View All</a>
+    </div>
+  </div>
+
+  <!-- Product Grid: Mobiles -->
+  <section class="container section" aria-labelledby="mobiles">
+    <div class="section-header">
+      <h2 id="mobiles">Best of Mobiles</h2>
+      <a href="#">View All</a>
+    </div>
+    <div class="grid">
+      <!-- Card 1 -->
+      <article class="card">
+        <div class="thumb">
+          <span class="chip">40% OFF</span>
+          <img src="https://picsum.photos/seed/phone1/600" alt="Smartphone X"/>
+        </div>
+        <div class="content">
+          <h3 class="title">Smartphone X (8GB RAM, 128GB)</h3>
+          <div class="rating">⭐ 4.3 • 12,345 Ratings</div>
+          <div class="price-row">
+            <div class="price">₹14,999</div>
+            <div class="mrp">₹24,999</div>
+            <div class="off">40% off</div>
+          </div>
+        </div>
+      </article>
+      <!-- Card 2 -->
+      <article class="card">
+        <div class="thumb">
+          <span class="chip">Bank Offer</span>
+          <img src="https://picsum.photos/seed/phone2/600" alt="Smartphone Y"/>
+        </div>
+        <div class="content">
+          <h3 class="title">Smartphone Y 5G (6GB, 128GB)</h3>
+          <div class="rating">⭐ 4.1 • 8,892 Ratings</div>
+          <div class="price-row">
+            <div class="price">₹12,499</div>
+            <div class="mrp">₹18,999</div>
+            <div class="off">34% off</div>
+          </div>
+        </div>
+      </article>
+      <!-- Card 3 -->
+      <article class="card">
+        <div class="thumb">
+          <span class="chip">Limited</span>
+          <img src="https://picsum.photos/seed/phone3/600" alt="Smartphone Z"/>
+        </div>
+        <div class="content">
+          <h3 class="title">Smartphone Z Plus (12GB, 256GB)</h3>
+          <div class="rating">⭐ 4.6 • 22,403 Ratings</div>
+          <div class="price-row">
+            <div class="price">₹27,499</div>
+            <div class="mrp">₹34,999</div>
+            <div class="off">21% off</div>
+          </div>
+        </div>
+      </article>
+      <!-- Card 4 -->
+      <article class="card">
+        <div class="thumb">
+          <span class="chip">Assured</span>
+          <img src="https://picsum.photos/seed/phone4/600" alt="Smartphone A"/>
+        </div>
+        <div class="content">
+          <h3 class="title">Smartphone A (4GB, 64GB)</h3>
+          <div class="rating">⭐ 3.9 • 3,210 Ratings</div>
+          <div class="price-row">
+            <div class="price">₹7,999</div>
+            <div class="mrp">₹10,999</div>
+            <div class="off">27% off</div>
+          </div>
+        </div>
+      </article>
+      <!-- Card 5 -->
+      <article class="card">
+        <div class="thumb">
+          <span class="chip">Deal</span>
+          <img src="https://picsum.photos/seed/phone5/600" alt="Smartphone B"/>
+        </div>
+        <div class="content">
+          <h3 class="title">Smartphone B (8GB, 256GB)</h3>
+          <div class="rating">⭐ 4.5 • 18,001 Ratings</div>
+          <div class="price-row">
+            <div class="price">₹19,499</div>
+            <div class="mrp">₹25,499</div>
+            <div class="off">24% off</div>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- Product Grid: Electronics -->
+  <section class="container section" aria-labelledby="electronics">
+    <div class="section-header">
+      <h2 id="electronics">Best of Electronics</h2>
+      <a href="#">View All</a>
+    </div>
+    <div class="grid">
+      <!-- 5 generic product cards for electronics -->
+      <article class="card">
+        <div class="thumb"><img src="https://picsum.photos/seed/laptop1/600" alt="Laptop"/></div>
+        <div class="content">
+          <h3 class="title">Laptop Pro 14"</h3>
+          <div class="rating">⭐ 4.5 • 5,320 Ratings</div>
+          <div class="price-row"><div class="price">₹54,990</div><div class="mrp">₹69,990</div><div class="off">21% off</div></div>
+        </div>
+      </article>
+      <article class="card">
+        <div class="thumb"><img src="https://picsum.photos/seed/earbuds1/600" alt="Earbuds"/></div>
+        <div class="content">
+          <h3 class="title">TWS Earbuds ANC</h3>
+          <div class="rating">⭐ 4.2 • 9,120 Ratings</div>
+          <div class="price-row"><div class="price">₹1,999</div><div class="mrp">₹3,999</div><div class="off">50% off</div></div>
+        </div>
+      </article>
+      <article class="card">
+        <div class="thumb"><img src="https://picsum.photos/seed/camera1/600" alt="Camera"/></div>
+        <div class="content">
+          <h3 class="title">Mirrorless Camera 24MP</h3>
+          <div class="rating">⭐ 4.6 • 2,030 Ratings</div>
+          <div class="price-row"><div class="price">₹39,990</div><div class="mrp">₹49,990</div><div class="off">20% off</div></div>
+        </div>
+      </article>
+      <article class="card">
+        <div class="thumb"><img src="https://picsum.photos/seed/monitor1/600" alt="Monitor"/></div>
+        <div class="content">
+          <h3 class="title">27" 2K IPS Monitor</h3>
+          <div class="rating">⭐ 4.4 • 1,240 Ratings</div>
+          <div class="price-row"><div class="price">₹14,499</div><div class="mrp">₹18,499</div><div class="off">22% off</div></div>
+        </div>
+      </article>
+      <article class="card">
+        <div class="thumb"><img src="https://picsum.photos/seed/keyboard1/600" alt="Keyboard"/></div>
+        <div class="content">
+          <h3 class="title">Mechanical Keyboard</h3>
+          <div class="rating">⭐ 4.3 • 7,401 Ratings</div>
+          <div class="price-row"><div class="price">₹2,499</div><div class="mrp">₹3,499</div><div class="off">29% off</div></div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- Product Grid: Home & Kitchen -->
+  <section class="container section" aria-labelledby="home">
+    <div class="section-header">
+      <h2 id="home">Home & Kitchen Picks</h2>
+      <a href="#">View All</a>
+    </div>
+    <div class="grid">
+      <article class="card">
+        <div class="thumb"><img src="https://picsum.photos/seed/mixer/600" alt="Mixer Grinder"/></div>
+        <div class="content">
+          <h3 class="title">Mixer Grinder 750W</h3>
+          <div class="rating">⭐ 4.1 • 6,310 Ratings</div>
+          <div class="price-row"><div class="price">₹2,799</div><div class="mrp">₹3,999</div><div class="off">30% off</div></div>
+        </div>
+      </article>
+      <article class="card">
+        <div class="thumb"><img src="https://picsum.photos/seed/cooker/600" alt="Pressure Cooker"/></div>
+        <div class="content">
+          <h3 class="title">Aluminium Pressure Cooker</h3>
+          <div class="rating">⭐ 4.0 • 3,100 Ratings</div>
+          <div class="price-row"><div class="price">₹1,099</div><div class="mrp">₹1,699</div><div class="off">35% off</div></div>
+        </div>
+      </article>
+      <article class="card">
+        <div class="thumb"><img src="https://picsum.photos/seed/bed/600" alt="Bedsheet"/></div>
+        <div class="content">
+          <h3 class="title">Cotton Double Bedsheet</h3>
+          <div class="rating">⭐ 3.9 • 1,980 Ratings</div>
+          <div class="price-row"><div class="price">₹499</div><div class="mrp">₹1,199</div><div class="off">58% off</div></div>
+        </div>
+      </article>
+      <article class="card">
+        <div class="thumb"><img src="https://picsum.photos/seed/bottle/600" alt="Bottle"/></div>
+        <div class="content">
+          <h3 class="title">Stainless Steel Bottle</h3>
+          <div class="rating">⭐ 4.4 • 12,010 Ratings</div>
+          <div class="price-row"><div class="price">₹399</div><div class="mrp">₹799</div><div class="off">50% off</div></div>
+        </div>
+      </article>
+      <article class="card">
+        <div class="thumb"><img src="https://picsum.photos/seed/pan/600" alt="Pan"/></div>
+        <div class="content">
+          <h3 class="title">Non-stick Frying Pan</h3>
+          <div class="rating">⭐ 4.2 • 4,560 Ratings</div>
+          <div class="price-row"><div class="price">₹699</div><div class="mrp">₹1,199</div><div class="off">42% off</div></div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-grid">
+      <div>
+        <h4>ABOUT</h4>
+        <a href="#">Contact Us</a>
+        <a href="#">About Us</a>
+        <a href="#">Careers</a>
+        <a href="#">Flipkart Stories</a>
+      </div>
+      <div>
+        <h4>GROUP COMPANIES</h4>
+        <a href="#">Myntra</a>
+        <a href="#">Cleartrip</a>
+        <a href="#">Shopsy</a>
+      </div>
+      <div>
+        <h4>HELP</h4>
+        <a href="#">Payments</a>
+        <a href="#">Shipping</a>
+        <a href="#">Cancellation & Returns</a>
+        <a href="#">FAQ</a>
+      </div>
+      <div>
+        <h4>CONSUMER POLICY</h4>
+        <a href="#">Return Policy</a>
+        <a href="#">Terms Of Use</a>
+        <a href="#">Security</a>
+        <a href="#">Privacy</a>
+      </div>
+      <div>
+        <h4>SOCIAL</h4>
+        <a href="#">Facebook</a>
+        <a href="#">Twitter</a>
+        <a href="#">YouTube</a>
+      </div>
+      <div>
+        <h4>Mail Us:</h4>
+        <a href="#">Flipkart Internet Private Limited,<br> Buildings Alyssa, Begonia & Clove Embassy Tech Village, Outer Ring Road, Devarabeesanahalli Village, Bengaluru, 560103, Karnataka, India</a>
+      </div>
+    </div>
+    <div class="container copyright">© 2025 Flipkart Clone, By Satyajit Biswal .</div>
+  </footer>
+
+</body>
+</html>
